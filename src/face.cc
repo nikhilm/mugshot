@@ -4,8 +4,8 @@
 #include <vector>
 #include <iostream>
 
-#include <node/v8.h>
-#include <node/node.h>
+#include <v8.h>
+#include <node.h>
 
 #include <libface/LibFace.h>
 #include <libface/Face.h>
