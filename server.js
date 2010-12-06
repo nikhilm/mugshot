@@ -22,28 +22,45 @@ function getOut(code, error, resp) {
     }));
 }
 
-function reply(faces, resp) {
+function reply(faces, id, resp) {
     resp.writeHead(200, { 'Content-Type': 'application/json' });
     resp.end(JSON.stringify({
         status: 'success',
-        faces: faces
+        faces: faces,
+        image_url: 'http://localhost:5000/image/'+id,
+        share_url: 'http://localhost:5000/view/'+id
     }));
+}
+
+function addToRedis(path, callback) {
+    var client = redis.createClient();
+    client.on('connected', function() {
+        client.incr('mugshot:image:globalId', function(err, id) {
+            if( !err ) {
+                client.set('mugshot:image:' + id, path, function(err) {
+                    callback(err, id);
+                });
+            }
+            else {
+                callback(err, null);
+            }
+        });
+    });
 }
 
 /*
  * Create a temporary writable file
  * delete it when the callback is done
  */
-function tempFile(callback) {
+function withFile(callback) {
     // TODO gen random filename
-    var filename = '/tmp/face.abcd';
-    console.log(filename);
+    var filename = '/tmp/data/face.'+process.pid+'.'+parseInt(Math.random()*10000);
     var stream = fs.createWriteStream(filename);
     callback(stream);
 }
 
 function handleUrl(request, response) {
-    tempFile(function(stream) {
+    withFile(function(stream) {
         var remote = "";
         request.on('data', function(data) {
             remote += data.toString();
@@ -74,7 +91,7 @@ function handleUrl(request, response) {
 };
 
 function handleFile(request, response) {
-    tempFile(function(stream) {
+    withFile(function(stream) {
         request.on('data', function(data) {
             stream.write(data);
         });
