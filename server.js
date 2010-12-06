@@ -78,7 +78,13 @@ function handleUrl(request, response) {
                  })
                  .on('end', function() {
                      stream.on('close', function() {
-                         reply(face.faces(stream.path), response);
+                         addToRedis(stream.path, function(err, id) {
+                             // we aren't concerned about the error
+                             // because we can always reply with
+                             // the list of faces right now even
+                             // if we can't cache it
+                             reply(face.faces(stream.path), id, response);
+                         });
                      });
                      stream.end();
                  })
@@ -98,7 +104,13 @@ function handleFile(request, response) {
         request.on('error', console.log);
         request.on('end', function() {
             stream.on('close', function() {
-                reply(face.faces(stream.path), response);
+                 addToRedis(stream.path, function(err, id) {
+                     // we aren't concerned about the error
+                     // because we can always reply with
+                     // the list of faces right now even
+                     // if we can't cache it
+                     reply(face.faces(stream.path), id, response);
+                 });
             });
             stream.end();
         });
