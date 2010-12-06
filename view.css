@@ -1,0 +1,11 @@
+div.face {
+    position: absolute;
+    border: solid 2px white;
+}
+
+div.face:hover {
+    border: solid 2px red;
+}
+
+div.tooltip {
+}
