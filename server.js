@@ -117,22 +117,47 @@ function handleFile(request, response) {
     });
 };
 
-http.createServer( function(request, response) {
-    if( request.method != 'POST' && request.method != 'PUT' ) {
-        getOut(405, 'PUT or POST Only', response);
-        return;
-    }
+var pageTemplate = _.template(fs.readFileSync('view.html', 'utf8'));
 
-    var path = url.parse(request.url).pathname;
-    if( path === '/faces/file' ) {
-        handleFile(request, response);
-        return;
-    }
+function viewInBrowser(request, response, id) {
+    var r = redis.createClient();
+    r.on('connected', function() {
+        r.get('mugshot:image:' + id, function(err, path) {
+            if( err ) {
+                response.writeHead(404, { "content-type": "text/html" });
+                response.end("No such image.");
+            }
+            else {
+                response.writeHead(200, { "content-type": "text/html" });
+                response.write(pageTemplate({ image_url: 'http://localhost:5000/image/' + require('path').basename(path.toString()), faces: JSON.stringify(face.faces(path.toString())) }));
+                response.end();
+            }
+        });
+    });
+}
 
-    if( path === '/faces/url' ) {
-        handleUrl(request, response);
-        return;
-    }
+var images = new servant.Servant('/tmp/data');
+var static = new servant.Servant('.');
+var router = choreo.router();
 
-    getOut(404, response);
-}).listen(process.argv[2] || 80);
+router.get('/view/*', viewInBrowser);
+
+router.post('/file', handleFile);
+
+router.post('/url', handleUrl);
+
+router.get('/image/*', function(request, response) {
+    request.url = request.url.replace(/^\/image/, '');
+    images.serve(request, response);
+});
+
+router.notFound(function(request, response) {
+    static.serve(request, response, function(err, obj) {
+        if(err) {
+            response.writeHead(404);
+            response.end("Page Not Found.");
+        }
+    });
+});
+
+http.createServer(router).listen(process.argv[2]||5000);
