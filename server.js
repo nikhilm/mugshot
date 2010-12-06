@@ -4,6 +4,10 @@ var http = require('http')
   , url = require('url')
   , cp = require('child_process')
   , face = require('./face')
+  , servant = require('./deps/servant/lib/servant')
+  , choreo = require('./deps/choreographer/choreographer')
+  , redis = require('./deps/redis-node-client/lib/redis-client')
+  , _ = require('./deps/underscore-1.1.3')._
 
 function getOut(code, error, resp) {
     if( error && !resp ) {
