@@ -62,10 +62,6 @@ function addToRedis(path, callback) {
     });
 }
 
-/*
- * Create a temporary writable file
- * delete it when the callback is done
- */
 function withFile(callback) {
     // TODO gen random filename
     var filename = '/tmp/data/face.'+process.pid+'.'+parseInt(Math.random()*10000);
@@ -80,6 +76,8 @@ function handleUrl(request, response) {
             remote += data.toString();
         });
         request.on('end', function() {
+            var size = 0;
+            var error = false;
             var parts = url.parse(remote);
             var client = http.createClient(80, parts.host);
             client.request('GET', parts.pathname || '/', {
@@ -88,9 +86,23 @@ function handleUrl(request, response) {
             })
             .on('response', function(remoteresponse) {
                  remoteresponse.on('data', function(data) {
+                     if( size > MAX_SIZE ) {
+                         error = true;
+                         remoteresponse.emit('error', 'File size exceeded');
+                        remoteresponse.destroy();
+                        return;
+                     }
                      stream.write(data);
+                     size += data.length;
                  })
                  .on('end', function() {
+                     // the 'close' callback gets
+                     // added only if error is false
+                     // so this is ok
+                     stream.end();
+                     if( error )
+                         return;
+
                      stream.on('close', function() {
                          addToRedis(stream.path, function(err, id) {
                              // we aren't concerned about the error
@@ -100,10 +112,13 @@ function handleUrl(request, response) {
                              reply(face.faces(stream.path), id, stream.path, response);
                          });
                      });
-                     stream.end();
                  })
                  .on('error', function() {
-                     getOut(500, response);
+                     fs.unlink(stream.path);
+                     if( error )
+                         getOut(413, 'Maximum size allowed is '+MAX_SIZE+' bytes', response);
+                     else
+                         getOut(500, response);
                  });;
             }).end();
         });
@@ -112,11 +127,29 @@ function handleUrl(request, response) {
 
 function handleFile(request, response) {
     withFile(function(stream) {
+        var size = 0;
+        var error = false;
         request.on('data', function(data) {
+            if( size > MAX_SIZE ) {
+                error = true;
+               request.emit('error', 'File size exceeded');
+               return;
+            }
             stream.write(data);
+            size += data.length;
         });
-        request.on('error', console.log);
+        request.on('error', function() {
+            if( error ) {
+                getOut(413, 'Maximum size allowed is '+MAX_SIZE+' bytes', response);
+                fs.unlink(stream.path);
+            }
+            else
+                console.log("Request error ", arguments);
+        });
         request.on('end', function() {
+            stream.end();
+            if( error )
+                return;
             stream.on('close', function() {
                  addToRedis(stream.path, function(err, id) {
                      // we aren't concerned about the error
@@ -126,7 +159,6 @@ function handleFile(request, response) {
                      reply(face.faces(stream.path), id, stream.path, response);
                  });
             });
-            stream.end();
         });
     });
 };
