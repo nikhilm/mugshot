@@ -7,6 +7,7 @@
 #include <v8.h>
 #include <node.h>
 
+#include <opencv2/opencv.hpp>
 #include <libface/LibFace.h>
 #include <libface/Face.h>
 
@@ -25,6 +26,11 @@ Handle<Value> Faces( const Arguments &args ) {
     filename = *asc;
   }
 
+  IplImage *img = cvLoadImage(filename.c_str());
+  if( !img ) {
+      return String::New( cvErrorStr( cvGetErrStatus() ) );
+  }
+
   libface::LibFace detector;
   std::vector<libface::Face> faces = detector.detectFaces(filename);
 
@@ -39,7 +45,7 @@ Handle<Value> Faces( const Arguments &args ) {
       faceArray->Set(Integer::New(i), coords);
   }
 
-  return faceArray;
+  return scope.Close(faceArray);
 }
 
 void Initialize( Handle<Object> target ) {
