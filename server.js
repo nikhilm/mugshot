@@ -10,7 +10,7 @@ var http = require('http')
   , _ = require('./deps/underscore-1.1.3')._
 
 var HOST = 'localhost';
-var PORT = parseInt(process.argv[2])||5000;
+var PORT = parseInt(process.argv[2])||8080;
 var URL = 'http://' + HOST + ':' + PORT;
 
 var MAX_SIZE = 5*1024*1024; // allow 5mb
@@ -176,4 +176,4 @@ router.notFound(function(request, response) {
     });
 });
 
-http.createServer(router).listen(PORT)
+http.createServer(router).listen(PORT);
