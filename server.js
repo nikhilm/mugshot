@@ -79,12 +79,19 @@ function handleUrl(request, response) {
             var size = 0;
             var error = false;
             var parts = url.parse(remote);
-            var client = http.createClient(80, parts.host);
+            var client = http.createClient(parseInt(parts.port)||80, parts.hostname);
+            client.on('error', function() {
+                getOut(500, response);
+            });
             client.request('GET', parts.pathname || '/', {
-                'host' : parts.host
+                'host' : parts.hostname
               , 'user-agent' : 'Mugshot FaceDetector'
             })
             .on('response', function(remoteresponse) {
+                if( remoteresponse.statusCode != 200 ) {
+                    getOut(500, "Remote server failed with status code " + remoteresponse.statusCode, response);
+                    return;
+                }
                  remoteresponse.on('data', function(data) {
                      if( size > MAX_SIZE ) {
                          error = true;
@@ -120,6 +127,8 @@ function handleUrl(request, response) {
                      else
                          getOut(500, response);
                  });;
+            }).on('error', function() {
+                getOut(500, response);
             }).end();
         });
     });
