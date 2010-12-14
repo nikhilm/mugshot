@@ -12,7 +12,7 @@ var http = require('http')
 var HOST = 'localhost';
 var PORT = parseInt(process.argv[2])||8080;
 var URL = 'http://' + HOST + ':' + PORT;
-
+var DBNO = 5;
 var MAX_SIZE = 5*1024*1024; // allow 5mb
 
 function getOut(code, error, resp) {
@@ -48,7 +48,8 @@ function reply(faces, id, path, resp) {
 function addToRedis(path, callback) {
     var client = redis.createClient();
     client.on('connected', function() {
-        client.incr('mugshot:image:globalId', function(err, id) {
+        client.select(DBNO);
+        client.incr('mugshot:globalId', function(err, id) {
             if( !err ) {
                 client.set('mugshot:image:' + id, path, function(err) {
                     callback(err, id);
@@ -135,6 +136,7 @@ var pageTemplate = _.template(fs.readFileSync('view.html', 'utf8'));
 function viewInBrowser(request, response, id) {
     var r = redis.createClient();
     r.on('connected', function() {
+        r.select(DBNO);
         r.get('mugshot:image:' + id, function(err, path) {
             if( err || !path ) {
                 response.writeHead(404, { "content-type": "text/html" });
