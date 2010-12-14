@@ -1,0 +1,139 @@
+<!DOCTYPE html PUBLIC
+    "-//W3C//DTD XHTML 1.1 plus MathML 2.0 plus SVG 1.1//EN"
+    "http://www.w3.org/2002/04/xhtml-math-svg/xhtml-math-svg.dtd">
+<html xml:lang='en' xmlns:svg='http://www.w3.org/2000/svg' xmlns='http://www.w3.org/1999/xhtml'>
+<head><meta content='application/xhtml+xml;charset=utf-8' http-equiv='Content-type' /><title>Mugshot</title>
+<style>
+body {
+	margin: auto;
+	width: 50%;
+    font-family: 'DejaVu Sans', sans-serif;
+}
+
+h1 {
+    font-size: 35px;
+}
+
+p {
+    font-size: 14px;
+    line-height: 150%;
+}
+</style>
+</head>
+
+<body>
+    <h1>Mugshot</h1>
+    <iframe
+        src="http://www.facebook.com/plugins/like.php?href=http%3A%2F%2F67.202.1.14%3A8080%2Findex.html&amp;layout=standard&amp;show_faces=false&amp;width=450&amp;action=like&amp;colorscheme=light&amp;height=35"
+        scrolling="no" frameborder="0" style="border:none; overflow:hidden;
+        width:450px; height:35px;" allowTransparency="true"></iframe>
+    <p>
+    Mugshot is a web service which provides simple face-detection in images. It
+    is an experiment making use of <a href="http://libface.sf.net">libface</a>
+    and <a href="http://nodejs.org">node.js</a>. A simple API allows clients
+    to upload or provide a URL for an image file. Mugshot will detect faces
+    and provide co-ordinates or allow a browser-based view highlighting the
+    faces.
+    </p>
+
+    <p>
+    Mugshot is an <strong>experiment</strong>. It was inspired by <a
+        href="http://openkeyval.org">OpenKeyVal</a>. It does not provide a 
+    permanent image hosting service like Flickr or Picasa. It is liable
+    to go down or be shut off at any point. Do not expect
+    that your images will be around for-ever or that they are privacy
+    protected.
+    So please make sure you think twice before trying it on an image.
+    I will of course <strong>NOT sell or distribute</strong> your images in any manner,
+    but <strong>nothing is stopping others</strong> from browsing through images by ID.
+    </p>
+
+    <h2>Who is behind Mugshot?</h2>
+    <p>
+    Mugshot is created by <a href="http://kodeclutz.blogspot.com">Nikhil
+        Marathe</a> using a thin V8 binding he has written to libface.
+    All code is open source and available on <a
+        href="https://github.com/nikhilm/mugshot">GitHub</a>.
+    Contact: nsm.nikhil@gmail.com
+    </p>
+
+    <h3>Constraints</h3>
+    <p>Images are restricted to a maximum of 5Mb in size. They will also be
+    deleted whenever disk space is low in order of least recently uploaded.</p>
+
+    <h2>API</h2>
+    <p>
+    Mugshot allows either file uploads or providing a URL to a remote image
+    file.
+    API access is of course langauge and platform specific. <a
+        href="http://curl.haxx.se">cURL</a> examples are provided.
+    </p>
+
+    <h3>Response</h3>
+    <p>
+    All replies are formatted as <a href="http://json.org">JSON</a> literals.
+    The <code>status</code> attribute will be either <code>"success"</code> or
+    <code>"error"</code>.
+
+    If <code>"success"</code>, the reply will be:</p>
+
+    <pre>
+    {
+        "status": "success",
+        "id": "&lt;id&gt;",
+        "image_url": "http://67.202.1.14:8080/image/&lt;unique_image_file&gt;",
+        "share_url": "http://67.202.1.14:8080/view/&lt;id&gt;",
+        "faces": [{
+                    "x": 5,
+                    "y": 5,
+                    "width": 30,
+                    "height": 30
+                  },
+                  ...]
+    }
+    </pre>
+
+    <p>
+    <code>image_url</code> provides the image directly, while
+    <code>share_url</code> has JavaScript and CSS which highlights the faces and
+    is a good way to view in the browser.
+    <code>faces</code> is an array of objects, each having
+    the co-ordinates of one face. It <strong>may</strong> be empty, if no faces
+    are detected. In case of an error:
+    </p>
+
+    <pre>
+    {
+        "status": "error",
+        "message": "error message"
+    }
+    </pre>
+
+    <p>
+    In addition, the HTTP status code will depend on the result.
+    <ul>
+        <li>200 - OK</li>
+        <li>415 - libface error. The most likely reason is the image format not
+        being supported.</li>
+        <li>500 - Some other error.</li>
+    </ul>
+    </p>
+
+    <h3>File uploads</h3>
+    <p>Make a POST request to <a href="http://67.202.1.14:8080/file">http://67.202.1.14:8080/file</a>
+    with the request body being the image data.</p>
+
+    <pre><code>
+    curl http://67.202.1.14:8080/file --data-binary @/path/to/image/file.ext
+    </code></pre>
+
+    <h3>URL</h3>
+    <p>Make a POST request to <a href="http://67.202.1.14:8080/url">http://67.202.1.14:8080/url</a>
+    with the request body being the URL where the image can be found.</p>
+
+    <pre><code>
+    curl http://67.202.1.14:8080/url --data "http://url/toimage"
+    </code></pre>
+
+</body>
+</html>
