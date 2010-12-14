@@ -390,8 +390,6 @@ Client.prototype.onReply_ = function (reply) {
     if (this.handlePublishedMessage_(reply)) 
         return;
 
-    console.log("REPLY " + reply);
-    console.log("ORIG " + this.originalCommands);
     var originalCommand = this.originalCommands.shift();
     var callback = originalCommand[originalCommand.length - 1];
 
