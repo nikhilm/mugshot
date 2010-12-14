@@ -9,6 +9,12 @@ var http = require('http')
   , redis = require('./deps/redis-node-client/lib/redis-client')
   , _ = require('./deps/underscore-1.1.3')._
 
+var HOST = 'localhost';
+var PORT = parseInt(process.argv[2])||5000;
+var URL = 'http://' + HOST + ':' + PORT;
+
+var MAX_SIZE = 5*1024*1024; // allow 5mb
+
 function getOut(code, error, resp) {
     if( error && !resp ) {
         resp = error;
@@ -31,8 +37,8 @@ function reply(faces, id, resp) {
     var obj = {
         status: 'success',
         faces: faces,
-        image_url: 'http://localhost:5000/image/'+id,
-        share_url: 'http://localhost:5000/view/'+id
+        image_url: URL + '/image/'+id,
+        share_url: URL + '/view/'+id
     };
     resp.writeHead(200, { 'Content-Type': 'application/json' });
     resp.end(JSON.stringify(obj));
@@ -157,6 +163,10 @@ router.get('/image/*', function(request, response) {
     images.serve(request, response);
 });
 
+router.get('/*', function(request, response) {
+    static.serve(request, response);
+});
+
 router.notFound(function(request, response) {
     static.serve(request, response, function(err, obj) {
         if(err) {
@@ -166,4 +176,4 @@ router.notFound(function(request, response) {
     });
 });
 
-http.createServer(router).listen(process.argv[2]||5000);
+http.createServer(router).listen(PORT)
