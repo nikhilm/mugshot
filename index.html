@@ -22,9 +22,9 @@ p {
 </head>
 
 <body>
-    <h1>Mugshot</h1>
+    <h1>Mugshot (Just slightly better than alpha)</h1>
     <iframe
-        src="http://www.facebook.com/plugins/like.php?href=http%3A%2F%2F67.202.1.14%3A8080%2Findex.html&amp;layout=standard&amp;show_faces=false&amp;width=450&amp;action=like&amp;colorscheme=light&amp;height=35"
+        src="http://www.facebook.com/plugins/like.php?href=http%3A%2F%2Fmugshotapp.com%3A8080%2Findex.html&amp;layout=standard&amp;show_faces=false&amp;width=450&amp;action=like&amp;colorscheme=light&amp;height=35"
         scrolling="no" frameborder="0" style="border:none; overflow:hidden;
         width:450px; height:35px;" allowTransparency="true"></iframe>
     <p>
@@ -81,8 +81,8 @@ p {
     {
         "status": "success",
         "id": "&lt;id&gt;",
-        "image_url": "http://67.202.1.14:8080/image/&lt;unique_image_file&gt;",
-        "share_url": "http://67.202.1.14:8080/view/&lt;id&gt;",
+        "image_url": "http://mugshotapp.com:8080/image/&lt;unique_image_file&gt;",
+        "share_url": "http://mugshotapp.com:8080/view/&lt;id&gt;",
         "faces": [{
                     "x": 5,
                     "y": 5,
@@ -120,19 +120,19 @@ p {
     </p>
 
     <h3>File uploads</h3>
-    <p>Make a POST request to <a href="http://67.202.1.14:8080/file">http://67.202.1.14:8080/file</a>
+    <p>Make a POST request to <a href="http://mugshotapp.com:8080/file">http://mugshotapp.com:8080/file</a>
     with the request body being the image data.</p>
 
     <pre><code>
-    curl http://67.202.1.14:8080/file --data-binary @/path/to/image/file.ext
+    curl http://mugshotapp.com:8080/file --data-binary @/path/to/image/file.ext
     </code></pre>
 
     <h3>URL</h3>
-    <p>Make a POST request to <a href="http://67.202.1.14:8080/url">http://67.202.1.14:8080/url</a>
+    <p>Make a POST request to <a href="http://mugshotapp.com:8080/url">http://mugshotapp.com:8080/url</a>
     with the request body being the URL where the image can be found.</p>
 
     <pre><code>
-    curl http://67.202.1.14:8080/url --data "http://url/toimage"
+    curl http://mugshotapp.com:8080/url --data "http://url/toimage"
     </code></pre>
 
 </body>
