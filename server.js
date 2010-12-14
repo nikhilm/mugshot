@@ -9,7 +9,7 @@ var http = require('http')
   , redis = require('./deps/redis-node-client/lib/redis-client')
   , _ = require('./deps/underscore-1.1.3')._
 
-var HOST = 'localhost';
+var HOST = 'mugshotapp.com';
 var PORT = parseInt(process.argv[2])||8080;
 var URL = 'http://' + HOST + ':' + PORT;
 var DBNO = 5;
