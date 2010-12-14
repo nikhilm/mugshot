@@ -15,7 +15,7 @@ function getOut(code, error, resp) {
         error = undefined;
     }
 
-    resp.writeHead(code);
+    resp.writeHead(code, { 'Content-Type': 'application/json' });
     resp.end(JSON.stringify({
         status: 'error',
         message: error || 'Unknown error'
@@ -23,13 +23,19 @@ function getOut(code, error, resp) {
 }
 
 function reply(faces, id, resp) {
-    resp.writeHead(200, { 'Content-Type': 'application/json' });
-    resp.end(JSON.stringify({
+    if( typeof(faces) == 'string' ) {
+        getOut(415, faces == 'No Error' ? 'Unknown error' : faces, resp);
+        return;
+    }
+
+    var obj = {
         status: 'success',
         faces: faces,
         image_url: 'http://localhost:5000/image/'+id,
         share_url: 'http://localhost:5000/view/'+id
-    }));
+    };
+    resp.writeHead(200, { 'Content-Type': 'application/json' });
+    resp.end(JSON.stringify(obj));
 }
 
 function addToRedis(path, callback) {
