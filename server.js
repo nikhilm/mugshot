@@ -83,7 +83,7 @@ function handleUrl(request, response) {
             var client = http.createClient(80, parts.host);
             client.request('GET', parts.pathname || '/', {
                 'host' : parts.host
-              , 'user-agent' : 'FaceDetector'
+              , 'user-agent' : 'Mugshot FaceDetector'
             })
             .on('response', function(remoteresponse) {
                  remoteresponse.on('data', function(data) {
