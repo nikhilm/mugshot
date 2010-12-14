@@ -37,6 +37,7 @@ function reply(faces, id, resp) {
     var obj = {
         status: 'success',
         faces: faces,
+        id: id,
         image_url: URL + '/image/'+id,
         share_url: URL + '/view/'+id
     };
