@@ -136,7 +136,7 @@ function viewInBrowser(request, response, id) {
     var r = redis.createClient();
     r.on('connected', function() {
         r.get('mugshot:image:' + id, function(err, path) {
-            if( err ) {
+            if( err || !path ) {
                 response.writeHead(404, { "content-type": "text/html" });
                 response.end("No such image.");
             }
