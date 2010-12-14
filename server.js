@@ -28,7 +28,7 @@ function getOut(code, error, resp) {
     }));
 }
 
-function reply(faces, id, resp) {
+function reply(faces, id, path, resp) {
     if( typeof(faces) == 'string' ) {
         getOut(415, faces == 'No Error' ? 'Unknown error' : faces, resp);
         return;
@@ -38,7 +38,7 @@ function reply(faces, id, resp) {
         status: 'success',
         faces: faces,
         id: id,
-        image_url: URL + '/image/'+id,
+        image_url: URL + '/image/'+require('path').basename(path),
         share_url: URL + '/view/'+id
     };
     resp.writeHead(200, { 'Content-Type': 'application/json' });
@@ -96,7 +96,7 @@ function handleUrl(request, response) {
                              // because we can always reply with
                              // the list of faces right now even
                              // if we can't cache it
-                             reply(face.faces(stream.path), id, response);
+                             reply(face.faces(stream.path), id, stream.path, response);
                          });
                      });
                      stream.end();
@@ -122,7 +122,7 @@ function handleFile(request, response) {
                      // because we can always reply with
                      // the list of faces right now even
                      // if we can't cache it
-                     reply(face.faces(stream.path), id, response);
+                     reply(face.faces(stream.path), id, stream.path, response);
                  });
             });
             stream.end();
