@@ -176,7 +176,7 @@ function viewInBrowser(request, response, id) {
             }
             else {
                 response.writeHead(200, { "content-type": "text/html" });
-                response.write(pageTemplate({ image_url: 'http://localhost:5000/image/' + require('path').basename(path.toString()), faces: JSON.stringify(face.faces(path.toString())) }));
+                response.write(pageTemplate({ image_url: URL + '/image/' + require('path').basename(path.toString()), faces: JSON.stringify(face.faces(path.toString())) }));
                 response.end();
             }
         });
